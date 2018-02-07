@@ -26,8 +26,9 @@ app:put('/user/[a-z0-9]+',function(request)
 end)
 ```
 ### 参数说明 request
+``` lua
 1. request.query : 这是一个table，指的是url解析后的query string，比如”/find/user?id=1&name=sumory&year=2016”被解析后会生成对象req.query,它的值为：
 2. request.body : 这是一个table，指的是form表单提交上来的数据。
 3. request.params:这是一个table，指的是url解析后的参数
- 
+```
  ### 这只是一个路由,以后有时间再完善这个框架,下一步把redis和json的封装一下.
