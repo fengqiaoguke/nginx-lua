@@ -32,21 +32,24 @@ function _M:get(rule,func)
     local _rule1 = string.gsub(rule, ':d','%%d+') 
 	local _rule1 = string.gsub(_rule1, ':w','%%w+')
 	local _rule1 = string.gsub(_rule1, ':a','%%a+')
+ 
 	if  string.match(_uri,_rule1) == _uri and string.lower(ngx.var.request_method) == 'get' then 
 	
 		--统计参数个数
 		_,num = string.gsub(rule, ':','')
-		local str = "{"
-		for i=1,num do
-		  str = str.."["..i.."]='%"..i.."',"
+		if num >0 then
+			local str = "{"
+			for i=1,num do
+			  str = str.."["..i.."]='%"..i.."',"
+			end
+			str = string.sub(str, 1, -2)..'}'
+			--把uri参数输出table格式
+			local _rule = string.gsub(rule, ':d','(%%d+)')
+			local _rule = string.gsub(_rule, ':w','(%%w+)')
+			local _rule = string.gsub(_rule, ':a','(%%a+)')
+			local _table = string.gsub(_uri,_rule,str)
+			request.params = StrToTable(_table)
 		end
-		str = string.sub(str, 1, -2)..'}'
-		--把uri参数输出table格式
-		local _rule = string.gsub(rule, ':d','(%%d+)')
-		local _rule = string.gsub(_rule, ':w','(%%w+)')
-		local _rule = string.gsub(_rule, ':a','(%%a+)')
-		local _table = string.gsub(_uri,_rule,str)
-		request.params = StrToTable(_table)
 	 
 		if func then
 			func(request)

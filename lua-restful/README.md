@@ -24,6 +24,18 @@ end)
 app:put('/user/[a-z0-9]+',function(request)
 	ngx.say(request.query.a) 
 end)
+
+--冒号开头正则匹配uri的参数,获取参数方式request.params[1]
+app:get('/blog/:d',function(request)
+	  ngx.say('this is blog, id=')
+	  ngx.say(request.params[1])
+end)
+
+--正则匹配uri,但不获取参数
+app:get('/article/[0-9]+',function(request)
+	  ngx.say('this is article') 
+end)
+
 ```
 ### 参数说明 request
 ``` lua
