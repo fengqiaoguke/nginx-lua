@@ -1,3 +1,8 @@
+local cjson = require "cjson"
+local config = require "RestLua.config"
+local redis = require "RestLua.redis"
+
+ngx.header['Content-Type']="text/html;charset=UTF-8"
 local _M = {}
 
 local get = {}
@@ -96,6 +101,28 @@ function _M:put(uri,func)
 		end
 	end
 end
+
+--输出json
+function _M:json(data,code,message)
+	local data = {
+		data = data,
+		code = code,
+		msg = message
+	}
+	return cjson.encode(data)
+end
+
+--redis
+function _M:redis()
+	local r = redis:new()
+	if r then
+		return r
+	else
+		ngx.say("<p>redis 连接失败</p>")
+		return nil
+	end
+end 
+
 
 --字符串转table
 function StrToTable(str)
