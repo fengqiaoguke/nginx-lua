@@ -114,9 +114,9 @@ end
 
 --redis
 function _M:redis()
-	local r = redis:new()
-	if r then
-		return r
+	local rs = redis:new()
+	if rs then
+		return rs
 	else
 		ngx.say("<p>redis 连接失败</p>")
 		return nil

@@ -1,9 +1,12 @@
 local app = require ("RestLua.app")
  
+local redis = app.redis()
 
-a = app.redis()
- 
-ngx.say(a:get(1))
+if redis ~= nil then
+	redis:get(1)
+
+end
+
  
 app:get('/blog/:d',function(request)
 	local id = request.params[1]

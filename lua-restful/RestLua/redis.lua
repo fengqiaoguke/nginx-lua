@@ -17,6 +17,9 @@ function _M.new(self)
             return nil
         end
     end
+    if config['redis']['db'] ~= nil then
+		red:select(config['redis']['db'])
+    end  
     red.close = close
     return red
 end
