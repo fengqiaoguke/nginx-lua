@@ -1,5 +1,7 @@
-local Note = {}
-function Note:add(data)
+local _M = {}
+
+-- 添加笔记
+function _M:add(data)
   if data['title'] == nil then
 	 
   else
@@ -7,4 +9,10 @@ function Note:add(data)
   end
 end
 
-return Note
+-- 笔记列表
+function _M:list(req)
+
+  ngx.say('list')
+end
+
+return _M

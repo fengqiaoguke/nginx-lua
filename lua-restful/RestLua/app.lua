@@ -55,7 +55,7 @@ function _M:put(rule,func)
 	runMethod('put',rule,func)
 end
 
---输出json
+--格式化json
 function _M:json(data,code,message)
 	local data = {
 		data = data,
@@ -65,14 +65,19 @@ function _M:json(data,code,message)
 	return cjson.encode(data)
 end
 
+--输出json
+function _M:returnJson(data,code,message)
+  ngx.say(_M:json(data,code,message))
+end
+
 --redis
 function _M:redis()
 	local rs = redis:new()
 	if rs then
 		return rs
 	else
-		ngx.say("<p>redis 连接失败</p>")
-		return nil
+		_M:returnJson('',-1,'redis连接失败')
+		ngx.eof() 
 	end
 end 
 

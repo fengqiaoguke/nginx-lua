@@ -7,7 +7,7 @@ local note = require "note"
 -- note
 --[笔记列表]
 app:get('/note',function(req)
- 
+  note:list(req)
  
 end)
 
