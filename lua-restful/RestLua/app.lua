@@ -1,6 +1,7 @@
 local cjson = require "cjson"
 local config = require "RestLua.config"
 local redis = require "RestLua.redis"
+local ruleNum = 0
 
 ngx.header['Content-Type']="text/html;charset=UTF-8"
 local _M = {}
@@ -31,75 +32,27 @@ request.body = post
 
 --get方法
 function _M:get(rule,func)
-	local _uri = string.lower(ngx.var.uri) 
-	
-
-    local _rule1 = string.gsub(rule, ':d','%%d+') 
-	local _rule1 = string.gsub(_rule1, ':w','%%w+')
-	local _rule1 = string.gsub(_rule1, ':a','%%a+')
- 
-	if  string.match(_uri,_rule1) == _uri and string.lower(ngx.var.request_method) == 'get' then 
-	
-		--统计参数个数
-		_,num = string.gsub(rule, ':','')
-		if num >0 then
-			local str = "{"
-			for i=1,num do
-			  str = str.."["..i.."]='%"..i.."',"
-			end
-			str = string.sub(str, 1, -2)..'}'
-			--把uri参数输出table格式
-			local _rule = string.gsub(rule, ':d','(%%d+)')
-			local _rule = string.gsub(_rule, ':w','(%%w+)')
-			local _rule = string.gsub(_rule, ':a','(%%a+)')
-			local _table = string.gsub(_uri,_rule,str)
-			request.params = StrToTable(_table)
-		end
-	 
-		if func then
-			func(request)
-		end
-	end
+	runMethod('get',rule,func)
 end
 
 --post方法
-function _M:post(uri,func)
-	local _uri = string.lower(ngx.var.uri)
-	if  string.match(_uri,uri) == _uri and string.lower(ngx.var.request_method) == 'post' then 
-		if func then
-			func(request)
-		end
-	end
+function _M:post(rule,func)
+	runMethod('post',rule,func)
 end
 
 --delete方法
-function _M:delete(uri,func)
-	local _uri = string.lower(ngx.var.uri)
-	if  string.match(_uri,uri) == _uri and string.lower(ngx.var.request_method) == 'delete' then 
-		if func then
-			func(request)
-		end
-	end
+function _M:delete(rule,func)
+	runMethod('delete',rule,func)
 end
 
 --patch方法
-function _M:patch(uri,func)
-	local _uri = string.lower(ngx.var.uri)
-	if  string.match(_uri,uri) == _uri and string.lower(ngx.var.request_method) == 'patch' then 
-		if func then
-			func(request)
-		end
-	end
+function _M:patch(rule,func)
+	runMethod('patch',rule,func)
 end
 
 --put方法
-function _M:put(uri,func)
-	local _uri = string.lower(ngx.var.uri)
-	if  string.match(_uri,uri) == _uri and string.lower(ngx.var.request_method) == 'put' then 
-		if func then
-			func(request)
-		end
-	end
+function _M:put(rule,func)
+	runMethod('put',rule,func)
 end
 
 --输出json
@@ -162,6 +115,41 @@ function PrintTable( tbl , level, filteDefault)
     end
   end
   ngx.say(indent_str .. "}")
+end
+
+-- 
+function runMethod(method,rule,func)
+	ruleNum  = ruleNum+1 
+	
+	local _uri = string.lower(ngx.var.uri)  
+  
+    local _rule1 = string.gsub(rule, ':d','%%d+') 
+	local _rule1 = string.gsub(_rule1, ':w','%%w+')
+	local _rule1 = string.gsub(_rule1, ':a','%%a+')
+ 
+	if  string.match(_uri,_rule1) == _uri and string.lower(ngx.var.request_method) == method then 
+		request.debug = {['rule_num']=ruleNum}
+		--统计参数个数
+		_,num = string.gsub(rule, ':','')
+		if num >0 then
+			local str = "{"
+			for i=1,num do
+			  str = str.."["..i.."]='%"..i.."',"
+			end
+			str = string.sub(str, 1, -2)..'}'
+			--把uri参数输出table格式
+			local _rule = string.gsub(rule, ':d','(%%d+)')
+			local _rule = string.gsub(_rule, ':w','(%%w+)')
+			local _rule = string.gsub(_rule, ':a','(%%a+)')
+			local _table = string.gsub(_uri,_rule,str)
+			request.params = StrToTable(_table)
+		end
+	 
+		if func then
+			func(request)
+		end
+		ngx.eof()
+	end
 end
 
 return _M

@@ -1,21 +1,36 @@
-local app = require ("RestLua.app")
- 
-local redis = app.redis()
 
-if redis ~= nil then
-	redis:get(1)
-
-end
+local app = require "RestLua.app"
+redis = app:redis()
+local note = require "note"
 
  
-app:get('/blog/:d',function(request)
-	local id = request.params[1]
-	 
-	ngx.say(id)
+-- note
+--[笔记列表]
+app:get('/note',function(req)
+ 
+ 
 end)
 
-
-
-app:get('/article/[0-9]+',function(request)
-	  ngx.say('this is article') 
+--[添加笔记]
+app:post('/note',function(req)
+  note:add(req.body)
 end)
+
+--[获取一条笔记]
+app:get('/note/:d',function(req)
+  ngx.say('get'..req.params[1]) 
+end)
+
+--[删除一条笔记]
+app:delete('/note/:d',function(req)
+  ngx.say('del'..req.params[1]) 
+end)
+
+--[编辑一条笔记]
+app:put('/note/:d',function(req)
+  ngx.say('edit'..req.params[1]) 
+end)
+
+-- end note
+
+
