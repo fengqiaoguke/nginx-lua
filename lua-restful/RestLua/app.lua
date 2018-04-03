@@ -70,6 +70,22 @@ function _M:returnJson(data,code,message)
   ngx.say(_M:json(data,code,message))
 end
 
+--输出错误
+function _M:error(message,code)
+  if code == nil or code >0 then
+	code = -1
+  end
+  ngx.say(_M:json('',code,message))
+end
+
+--输出成功
+function _M:success(message,code)
+  if code == nil or code < 0 then
+	code = 0
+  end
+  ngx.say(_M:json('',code,message))
+end
+
 --redis
 function _M:redis()
 	local rs = redis:new()
@@ -77,7 +93,7 @@ function _M:redis()
 		return rs
 	else
 		_M:returnJson('',-1,'redis连接失败')
-		ngx.eof() 
+		ngx.exit(200)
 	end
 end 
 
@@ -122,7 +138,7 @@ function PrintTable( tbl , level, filteDefault)
   ngx.say(indent_str .. "}")
 end
 
--- 
+-- 执行rest
 function runMethod(method,rule,func)
 	ruleNum  = ruleNum+1 
 	
@@ -153,8 +169,25 @@ function runMethod(method,rule,func)
 		if func then
 			func(request)
 		end
-		ngx.eof()
+		ngx.exit(200);
 	end
+end
+
+-- 转换成整型
+function intval(x)
+  x = tonumber(x)
+  if x == nil then
+	x = 0
+  elseif x <= 0 then
+   return math.ceil(x)
+  end
+
+  if math.ceil(x) == x then
+	 x = math.ceil(x);
+  else
+	 x = math.ceil(x) - 1
+  end
+  return x
 end
 
 return _M
