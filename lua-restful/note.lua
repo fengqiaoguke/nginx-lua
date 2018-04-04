@@ -9,12 +9,21 @@ function _M:add(data)
   else
 	--添加到hash
 	local id = redis:incr('note:_id')
-	local key = 'note:'..id
+	local tagid = intval(data['tag_id'])
+	local uid = intval(data['uid'])
+	local key = 'u'..uid..':note:'..id
+	redis:multi()
 	redis:hset(key,'id',id)
 	redis:hset(key,'title',data['title'])
 	redis:hset(key,'content',data['content'])
-	redis:hset(key,'tag_id',intval(data['tag_id']))
-	redis:hset(key,'uid',intval(data['uid']))
+	redis:hset(key,'tag_id',tagid)
+	redis:hset(key,'uid',uid)
+	--列表
+	redis:zadd('u'..uid..':note:list',os.time(),id)
+	if tagid ~= nil and tagid >0 then 
+	  redis:zadd('u'..uid..':note:tag'..tagid..':list',os.time(),id)
+	end
+	redis:exec()
     app:returnJson({['id']=id},1,'添加成功')
   end
 end
@@ -41,9 +50,47 @@ function _M:edit(id,data)
 end
 
 -- 笔记列表
-function _M:list(req)
-  app:success('aaa') 
+function _M:listData(tagId,page)
+  local uid = 1
+  local pageSize = 20
+  local startNum = 0
+  local endNum = pageSize
   
+  if page == nil or page<=0 then
+	page = 1
+  end
+  
+  local page = 1
+  
+  local key = 'u'..uid..':note:list'
+  
+  if tagId ~= nil and tagId >0 then
+	key = 'u'..uid..':note:tag'..tagId..':list'
+  end  
+  
+  local totalNum = redis:zcard(key)
+  local totalPage = 0
+  local nextPage = ""
+   
+  if page ~= nil and totalPage ~= nil and page < totalPag then
+	nextPage = page + 1
+	startNum = (page - 1) * pageSize
+	endNum = page * pageSize
+  else  
+	nextPage = ""
+	startNum = (totalPage - 1) * pageSize
+	endNum = totalPage * pageSize
+  end
+  
+  endNum = endNum - 1
+  local rs = redis:zRevRange(key, start, endNum)
+  
+  local result = {}
+  result['list'] = "";
+  result['total_num'] = totalNum;
+  result['total_page'] = totalPage;
+  result['next_page'] = nextPage;
+  app:returnJson(result,1,'笔记列表')
 end
 
 -- 获取单条信息

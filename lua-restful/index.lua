@@ -17,7 +17,7 @@ local note = require "note"
 -- note
 --[笔记列表]
 app:get('/note',function(req)
-  note:list(req.query)
+  note:listData(1,1)
 end)
 
 --[添加笔记]
