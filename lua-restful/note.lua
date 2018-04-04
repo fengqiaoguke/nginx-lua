@@ -19,6 +19,27 @@ function _M:add(data)
   end
 end
 
+--编辑笔记
+function _M:edit(id,data)
+  local id = intval(id)
+  if id == nil then
+	app:error('id不能空')
+  else
+	--添加到hash 
+	local key = 'note:'..id
+	if data['title'] ~= nil then
+	  redis:hset(key,'title',data['title'])
+	end
+	if data['content'] ~= nil then
+	  redis:hset(key,'content',data['content'])
+	end
+	if data['title'] ~= nil then
+	  redis:hset(key,'tag_id',intval(data['tag_id']))
+	end
+    app:returnJson(data,1,'编辑成功')
+  end  
+end
+
 -- 笔记列表
 function _M:list(req)
   app:success('aaa') 

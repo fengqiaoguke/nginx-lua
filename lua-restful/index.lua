@@ -12,9 +12,8 @@ if ngx.var.request_method == "OPTIONS" then
 end
 
 redis = app:redis()
-local note = require "note"
+local note = require "note" 
 
-PrintTable(ngx.req.get_headers()) 
 -- note
 --[笔记列表]
 app:get('/note',function(req)
