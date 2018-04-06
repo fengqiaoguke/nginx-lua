@@ -1,5 +1,8 @@
 
 app = require "RestLua.app"
+user = require "user"
+local note = require "note" 
+
 ngx.header["Access-Control-Allow-Origin"] = "*"
 ngx.header["Access-Control-Allow-Headers"] = "DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Content-Range,Range, userid, agent, brandid, language, uid,timestamp,token"
 
@@ -12,12 +15,14 @@ if ngx.var.request_method == "OPTIONS" then
 end
 
 redis = app:redis()
-local note = require "note" 
+
+--check token
+UID = user:checkToken() or 0
 
 -- note
 --[笔记列表]
 app:get('/note',function(req)
-  note:listData(1,1)
+  note:listData(req.query['tag_id'],req.query['page'])
 end)
 
 --[添加笔记]

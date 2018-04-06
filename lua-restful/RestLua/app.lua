@@ -76,6 +76,7 @@ function _M:error(message,code)
 	code = -1
   end
   ngx.say(_M:json('',code,message))
+	ngx.exit(500)
 end
 
 --输出成功
@@ -179,7 +180,7 @@ function intval(x)
   if x == nil then
 	x = 0
   elseif x <= 0 then
-   return math.ceil(x)
+   return tonumber(math.ceil(x))
   end
 
   if math.ceil(x) == x then
@@ -187,7 +188,7 @@ function intval(x)
   else
 	 x = math.ceil(x) - 1
   end
-  return x
+  return tonumber(x)
 end
 
 return _M
