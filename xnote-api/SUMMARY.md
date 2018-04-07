@@ -9,7 +9,7 @@
 * [登录](user/login.md)
 * [注册](user/register.md)
 * [获取用户信息](user/getinfo.md)
-* [编辑用户信息](user/editinfot.md)
+* [编辑用户信息](user/editinfo.md)
 
 ## 标签
 
