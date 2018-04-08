@@ -47,4 +47,33 @@ end)
 
 -- end note
 
+-- category
+local category = require "category" 
+--[分类列表]
+app:get('/category',function(req)
+  category:listData(req.query['page'])
+end)
+
+--[添加分类]
+app:post('/category',function(req)
+  category:add(req.body)
+end)
+
+--[获取一条分类]
+app:get('/category/:d',function(req) 
+  category:info(req.params[1])
+end)
+
+--[删除一条分类]
+app:delete('/category/:d',function(req)
+  category:delete(req.params[1])
+end)
+
+--[编辑一条分类]
+app:put('/category/:d',function(req)
+  category:edit(req.params[1],req.body)
+end)
+
+-- end category
+
 
