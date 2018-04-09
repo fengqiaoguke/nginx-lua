@@ -19,7 +19,7 @@ function _M:add(data)
 	--添加到hash
 	local id = redis:incr('sys:category:_id')
 	local uid = intval(UID)
-	local key = 'u'..uid..':note:'..id
+	local key = 'u'..uid..':category:'..id
 	if uid <= 0 then
 		app:error('请先登录')
 	end
@@ -106,6 +106,12 @@ function _M:info(id)
 	local key = 'u'..UID..':category:'..id
   local data = getInfo(key)
   app:returnJson(data,1,'获取信息')
+end
+
+-- 删除分类
+function _M:delete(id)
+
+
 end
 
 
