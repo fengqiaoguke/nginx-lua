@@ -110,8 +110,16 @@ end
 
 -- 删除分类
 function _M:delete(id)
-
-
+	if UID <= 0 then
+		app:error('uid不能空')
+	end
+	local hkey = 'u'..UID..':category:'..id
+	local zkey = 'u'..UID..':category:list'
+	redis:multi()
+  redis:zrem(zkey,hkey)
+	redis:del(hkey) 
+	local rs = redis:exec()
+	app:returnJson(data,1,'删除成功'..zkey..'>'..hkey)
 end
 
 
