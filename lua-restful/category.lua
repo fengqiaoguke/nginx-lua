@@ -8,7 +8,6 @@ local function getInfo(key)
   data['createtime'] = redis:hget(key,'createtime')
   data['updatetime'] = redis:hget(key,'updatetime')
 	return data
-
 end
 
 -- 添加分类

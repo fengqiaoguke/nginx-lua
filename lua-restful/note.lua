@@ -1,3 +1,4 @@
+local cjson = require "cjson"
 local _M = {}
 
 local function getInfo(key) 
@@ -7,6 +8,11 @@ local function getInfo(key)
   data['title'] = redis:hget(key,'title')
   data['content'] = redis:hget(key,'content')
   data['tag_id'] = redis:hget(key,'tag_id')
+  data['type'] = redis:hget(key,'type')
+	local head = redis:hget(key,'head') or '[]'
+  data['head'] = cjson.decode(head)
+	local tab = redis:hget(key,'table') or '[]'
+  data['table'] = cjson.decode(tab)
   data['createtime'] = redis:hget(key,'createtime')
   data['updatetime'] = redis:hget(key,'updatetime')
 	return data
@@ -34,6 +40,9 @@ function _M:add(data)
 	redis:hset(key,'content',data['content'])
 	redis:hset(key,'tag_id',tagid)
 	redis:hset(key,'uid',uid)
+	redis:hset(key,'type',data['type'] or '')
+	redis:hset(key,'table',cjson.encode(data['table']))
+	redis:hset(key,'head',cjson.encode(data['head'])) 
 	redis:hset(key,'createtime',os.date("%Y-%m-%d %H:%M:%S",os.time()))
 	--列表
 	redis:zadd('u'..uid..':note:list',os.time(),key)
@@ -60,6 +69,9 @@ function _M:edit(id,data)
 		end
 		if data['content'] ~= nil then
 			redis:hset(key,'content',data['content'])
+		end
+		if data['table'] ~= nil then
+			redis:hset(key,'table',data['table'])
 		end
 		if data['tag_id'] ~= nil then
 			redis:hset(key,'tag_id',intval(data['tag_id']))

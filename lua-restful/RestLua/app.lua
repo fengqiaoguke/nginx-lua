@@ -20,23 +20,21 @@ for k,v in pairs(arg) do
 	get[k] = v 
 end 
 request.query = get
- 
--- post
+
+-- 解析post传值
 ngx.req.read_body() 
 local arg = ngx.req.get_post_args()
 for k,v in pairs(arg) do
-   post[k] = v
-end
-request.body = post
-
-
+	request.body = cjson.decode(k)
+end 
+ 
 --get方法
 function _M:get(rule,func)
 	runMethod('get',rule,func)
 end
 
 --post方法
-function _M:post(rule,func)
+function _M:post(rule,func)	 
 	runMethod('post',rule,func)
 end
 
@@ -109,7 +107,7 @@ function StrToTable(str)
 end
 
 --打印table
-function PrintTable( tbl , level, filteDefault)
+function printTable( tbl , level, filteDefault)
   local msg = ""
   filteDefault = filteDefault or true --默认过滤关键字（DeleteMe, _class_type）
   level = level or 1
@@ -125,14 +123,14 @@ function PrintTable( tbl , level, filteDefault)
         local item_str = string.format("%s%s = %s", indent_str .. " ",tostring(k), tostring(v))
         ngx.say(item_str)
         if type(v) == "table" then
-          PrintTable(v, level + 1)
+          printTable(v, level + 1)
         end
       end
     else
       local item_str = string.format("%s%s = %s", indent_str .. " ",tostring(k), tostring(v))
       ngx.say(item_str)
       if type(v) == "table" then
-        PrintTable(v, level + 1)
+        printTable(v, level + 1)
       end
     end
   end
