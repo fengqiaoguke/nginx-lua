@@ -71,7 +71,7 @@ function _M:edit(id,data)
 			redis:hset(key,'content',data['content'])
 		end
 		if data['table'] ~= nil then
-			redis:hset(key,'table',data['table'])
+			redis:hset(key,'table',cjson.encode(data['table']))
 		end
 		if data['tag_id'] ~= nil then
 			redis:hset(key,'tag_id',intval(data['tag_id']))
