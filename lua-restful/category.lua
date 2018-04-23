@@ -69,7 +69,7 @@ function _M:listData(page)
   end 
   local key = 'u'..uid..':category:list'
   
-  local totalNum = redis:zcard(key)
+  local totalNum = redis:zcard(key) or 0
   local totalPage = math.ceil(totalNum/pageSize)
   local nextPage = ""
  
@@ -87,6 +87,11 @@ function _M:listData(page)
   local rs = redis:zRevRange(key, startNum, endNum)
 	local result = {}
 	local items= {}
+	
+	if rs == nil then
+		rs = {}
+	end
+	
 	for i,v in ipairs(rs) do
 		items[i] = getInfo(v)
 	end	 

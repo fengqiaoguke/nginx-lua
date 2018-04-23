@@ -174,11 +174,11 @@ end
 
 -- 转换成整型
 function intval(x)
-  x = tonumber(x)
+	x = tonumber(x) or 0
   if x == nil then
-	x = 0
+		x = 0
   elseif x <= 0 then
-   return tonumber(math.ceil(x))
+		return tonumber(math.ceil(x))
   end
 
   if math.ceil(x) == x then

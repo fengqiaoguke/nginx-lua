@@ -22,34 +22,34 @@ end
 -- 添加笔记
 function _M:add(data)
   if data['title'] == nil then
-	app:error('标题不能空')
+		app:error('标题不能空')
   elseif data['content'] == nil then
-	app:error('内容不能空')
+		app:error('内容不能空')
   else
-	--添加到hash
-	local id = redis:incr('sys:note:_id')
-	local tagid = intval(data['tag_id'])
-	local uid = intval(UID)
-	local key = 'u'..uid..':note:'..id
-	if uid <= 0 then
-		app:error('请先登录')
-	end
-	redis:multi()
-	redis:hset(key,'id',id)
-	redis:hset(key,'title',data['title'])
-	redis:hset(key,'content',data['content'])
-	redis:hset(key,'tag_id',tagid)
-	redis:hset(key,'uid',uid)
-	redis:hset(key,'type',data['type'] or '')
-	redis:hset(key,'table',cjson.encode(data['table']))
-	redis:hset(key,'head',cjson.encode(data['head'])) 
-	redis:hset(key,'createtime',os.date("%Y-%m-%d %H:%M:%S",os.time()))
-	--列表
-	redis:zadd('u'..uid..':note:list',os.time(),key)
-	if tagid ~= nil and tagid >0 then 
-	  redis:zadd('u'..uid..':note:tag'..tagid..':list',os.time(),key)
-	end
-	redis:exec()
+		--添加到hash
+		local id = redis:incr('sys:note:_id') 
+		local tagid = intval(data['tag_id'])
+		local uid = intval(UID)
+		local key = 'u'..uid..':note:'..id
+		if uid <= 0 then
+			app:error('请先登录')
+		end
+		redis:multi()
+		redis:hset(key,'id',id)
+		redis:hset(key,'title',data['title'])
+		redis:hset(key,'content',data['content'])
+		redis:hset(key,'tag_id',tagid)
+		redis:hset(key,'uid',uid)
+		redis:hset(key,'type',data['type'] or '')
+		redis:hset(key,'table',cjson.encode(data['table']))
+		redis:hset(key,'head',cjson.encode(data['head'])) 
+		redis:hset(key,'createtime',os.date("%Y-%m-%d %H:%M:%S",os.time()))
+		--列表
+		redis:zadd('u'..uid..':note:list',os.time(),key)
+		if tagid ~= nil and tagid >0 then 
+			redis:zadd('u'..uid..':note:tag'..tagid..':list',os.time(),key)
+		end
+		redis:exec()
     app:returnJson({['id']=id},1,'添加成功')
   end
 end
@@ -71,7 +71,7 @@ function _M:edit(id,data)
 			redis:hset(key,'content',data['content'])
 		end
 		if data['table'] ~= nil then
-			redis:hset(key,'table',data['table'])
+			redis:hset(key,'table',cjson.encode(data['table']))
 		end
 		if data['tag_id'] ~= nil then
 			redis:hset(key,'tag_id',intval(data['tag_id']))
@@ -104,7 +104,7 @@ function _M:listData(tagId,page)
 	key = 'u'..uid..':note:tag'..tagId..':list'
   end  
   
-  local totalNum = redis:zcard(key)
+  local totalNum = redis:zcard(key) or 0
   local totalPage = math.ceil(totalNum/pageSize)
   local nextPage = ""
  
@@ -119,7 +119,7 @@ function _M:listData(tagId,page)
   end
   
   endNum = endNum - 1
-  local rs = redis:zRevRange(key, startNum, endNum)
+  local rs = redis:zRevRange(key, startNum, endNum) or {}
 	local result = {}
 	local items= {}
 	for i,v in ipairs(rs) do
