@@ -3,7 +3,7 @@ local config = require "RestLua.config"
 local redis = require "RestLua.redis"
 local ruleNum = 0
 
-ngx.header['Content-Type']="text/html;charset=UTF-8"
+
 local _M = {}
 
 local get = {}
