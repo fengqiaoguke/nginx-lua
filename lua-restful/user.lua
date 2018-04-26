@@ -1,10 +1,10 @@
-local _M = {}
- 
+local _M = {} 
 
 local head = ngx.req.get_headers()
+
  
---  
-function _M:checkToken() 
+-- 验证签名有效性 
+function _M:checkSign() 
 	local utoken = 1 
 	local timestamp = head['timestamp'] or ''
 	local sign = ngx.md5(ngx.var.request_uri .. '@'.. utoken ..'#'..timestamp)

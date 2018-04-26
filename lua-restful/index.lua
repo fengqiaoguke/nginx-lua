@@ -10,15 +10,15 @@ if ngx.var.request_method == "OPTIONS" then
 end
 
 app = require "RestLua.app"
-user = require "user"
+local user = require "user"
 local note = require "note" 
-
+local wechat = require "wechat" 
 
 
 redis = app:redis()
 
---check token
-UID = user:checkToken() or 0
+--check sign
+--UID = user:checkSign() or 0
 
 -- note
 --[笔记列表]
@@ -73,6 +73,12 @@ end)
 --[编辑一条分类]
 app:put('/category/:d',function(req)
   category:edit(req.params[1],req.body)
+end)
+
+
+--[获取微信openid]
+app:get('/wechat/openid',function(req)
+  wechat:getOpenId('061kAAC4257AzN0WRiE42KaQC42kAAC8')
 end)
 
 -- end category

@@ -1,6 +1,7 @@
 local cjson = require "cjson"
 local config = require "RestLua.config"
 local redis = require "RestLua.redis"
+local http = require "resty.http" 
 local ruleNum = 0
 
 
@@ -95,6 +96,59 @@ function _M:redis()
 		ngx.exit(200)
 	end
 end 
+
+function sendPost(url, body, timeout, ssl_verify)
+		local httpc = http.new()
+
+		timeout = timeout or 30000
+		httpc:set_timeout(timeout)
+		local res, err_ = httpc:request_uri(url, {
+						ssl_verify = ssl_verify or false,
+						method = "POST",
+						body = body,
+						headers = {
+								["Content-Type"] = "application/x-www-form-urlencoded",
+						}
+		})
+
+   if not res then
+        return nil, err_
+   else
+      if res.status == 200 then
+                return res.body, err_
+           else
+                return nil, err_
+           end
+    end
+
+end
+
+
+function sendGet(url, body, timeout, ssl_verify)
+		local httpc = http.new()
+
+		timeout = timeout or 30000
+		httpc:set_timeout(timeout)
+		local res, err_ = httpc:request_uri(url, {
+						ssl_verify = ssl_verify or false,
+						method = "GET",
+						body = body,
+						headers = {
+							["Content-Type"] = "text/html",
+					}
+		})
+
+   if not res then
+        return nil, err_
+   else
+      if res.status == 200 then
+                return res.body, err_
+           else
+                return nil, err_
+           end
+    end
+
+end
 
 
 --字符串转table
