@@ -17,8 +17,24 @@ local wechat = require "wechat"
 
 redis = app:redis()
 
+
+--[生成登录二维码]
+app:post('/session/qr',function(req)
+  user:buildQR(req.body['rand'])
+end)
+
+--[扫码登录]
+app:get('/session/qr/login',function(req)
+  user:loginRQ(req.query['code'],req.query['utoken'])
+end)
+
+--[检查是否扫二维码]
+app:get('/session/qr',function(req)
+  user:checkQR(req.query['code'])
+end)
+
 --check sign
---UID = user:checkSign() or 0
+UID = user:checkSign() or 0
 
 -- note
 --[笔记列表]

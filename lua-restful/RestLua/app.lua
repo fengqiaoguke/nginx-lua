@@ -72,7 +72,7 @@ end
 --输出错误
 function _M:error(message,code)
   if code == nil or code >0 then
-	code = -1
+		code = -1
   end
   ngx.say(_M:json('',code,message))
 	ngx.exit(500)
