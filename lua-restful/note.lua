@@ -84,7 +84,7 @@ end
 -- 笔记列表
 function _M:listData(tagId,page)
   local uid = intval(UID) or 0
-  local pageSize = 20
+  local pageSize = 2
   local startNum = 0
   local endNum = pageSize
   local page = page or 1
@@ -95,13 +95,13 @@ function _M:listData(tagId,page)
 	end
   
   if page == nil or page<=0 then
-	page = 1
+		page = 1
   end 
   
   local key = 'u'..uid..':note:list'
   
   if tagId >0 then
-	key = 'u'..uid..':note:tag'..tagId..':list'
+		key = 'u'..uid..':note:tag'..tagId..':list'
   end  
   
   local totalNum = redis:zcard(key) or 0
