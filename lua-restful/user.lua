@@ -14,6 +14,45 @@ function _M:checkSign()
 	return tonumber(head['uid']) or 0
 end
 
+-- 微信登录
+function _M:loginWechat(openid,username)
+	if openid == nil or username == nil then
+		app.error('openid和username不能空')
+	end
+	--判断是否绑定小程序
+	local uid = redis:zscore('wechat:openid',openid)
+	uid = tonumber(uid) or 0
+	-- 注册新用户并绑定openid
+	if uid == 0 then
+		uid = redis:incr('sys:user:_uid')
+		local key = 'user:'..uid
+		redis:multi()
+		redis:hset(key,'uid',uid)
+		redis:hset(key,'username',username)
+		redis:hset(key,'createtime',os.date("%Y-%m-%d %H:%M:%S",os.time()))
+		-- 加入用户列表
+		redis:zadd('user:list',os.time(),uid)
+		-- 绑定小程序openid
+		redis:zadd('wechat:openid',uid,openid)
+		redis:exec()
+	end
+	-- 删除旧utoken
+	local oldUtoken = redis:get('openid:'..openid) or ''
+ 
+	if type(oldUtoken) == "string" and oldUtoken ~= nil then
+		redis:del('utoken:'..oldUtoken)
+	end
+	
+	-- 生成utoken
+	local utoken = ngx.md5(os.time()..uid)
+	redis:setex('utoken:'..utoken,24*30*365, uid)
+	redis:setex('openid:'..openid,24*30*365, utoken)
+	local data = {
+		utoken = utoken
+	}
+	app:returnJson(data,200,'登录成功')
+end
+
 -- 生成登录二维码
 function _M:buildQR(rand)
 	local rs =  ngx.md5(rand..head['user-agent']..os.time())

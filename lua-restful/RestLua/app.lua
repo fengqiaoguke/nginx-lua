@@ -26,7 +26,9 @@ request.query = get
 ngx.req.read_body() 
 local arg = ngx.req.get_post_args()
 for k,v in pairs(arg) do
-	request.body = cjson.decode(k)
+	if k then
+		request.body = cjson.decode(k)
+	end
 end 
  
 --get方法

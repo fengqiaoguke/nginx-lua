@@ -14,9 +14,12 @@ local user = require "user"
 local note = require "note" 
 local wechat = require "wechat" 
 
-
 redis = app:redis()
 
+--[微信登录]
+app:post('/session/wechat',function(req)
+	user:loginWechat(req.body['openid'],req.body['username'])
+end)
 
 --[生成登录二维码]
 app:post('/session/qr',function(req)
