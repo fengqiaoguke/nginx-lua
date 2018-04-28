@@ -1,6 +1,6 @@
 var apiWechatHost = 'https://www.xueyanshe.com/todolist/public/index.php';
 var apiHost = 'http://47.52.145.61'
-apiHost = 'http://localhost:81'
+//apiHost = 'http://localhost:81'
 
 function error(msg) {
   wx.showToast({
