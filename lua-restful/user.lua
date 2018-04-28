@@ -1,17 +1,18 @@
 local _M = {} 
-
+local cjson = require "cjson"
 local app = require "RestLua.app"
 local head = ngx.req.get_headers()
  
 -- 验证签名有效性 
 function _M:checkSign() 
-	local utoken = 1 
+	local utoken = head['utoken'] or ''
+	local uid = tonumber(redis:get('utoken:'..utoken)) or 0
 	local timestamp = head['timestamp'] or ''
-	local sign = ngx.md5(ngx.var.request_uri .. '@'.. utoken ..'#'..timestamp)
+	local sign = ngx.md5(ngx.var.request_uri .. '@'.. uid ..'#'..timestamp)
 	if head['sign'] ~= sign then
-		app:error('签名错误',-403)
+		app:error('签名错误',-4003)
 	end
-	return tonumber(head['uid']) or 0
+	return uid
 end
 
 -- 微信登录
@@ -20,8 +21,10 @@ function _M:loginWechat(openid,username)
 		app.error('openid和username不能空')
 	end
 	--判断是否绑定小程序
-	local uid = redis:zscore('wechat:openid',openid)
+	local hkey = 'openid:'..openid
+	local uid = redis:hget(hkey,'uid')
 	uid = tonumber(uid) or 0
+	local oldUtoken = redis:hget(hkey,'utoken')
 	-- 注册新用户并绑定openid
 	if uid == 0 then
 		uid = redis:incr('sys:user:_uid')
@@ -31,24 +34,25 @@ function _M:loginWechat(openid,username)
 		redis:hset(key,'username',username)
 		redis:hset(key,'createtime',os.date("%Y-%m-%d %H:%M:%S",os.time()))
 		-- 加入用户列表
-		redis:zadd('user:list',os.time(),uid)
-		-- 绑定小程序openid
-		redis:zadd('wechat:openid',uid,openid)
+		redis:zadd('user:list',os.time(),uid) 
 		redis:exec()
 	end
-	-- 删除旧utoken
-	local oldUtoken = redis:get('openid:'..openid) or ''
- 
+	-- 删除旧utoken  
 	if type(oldUtoken) == "string" and oldUtoken ~= nil then
 		redis:del('utoken:'..oldUtoken)
 	end
 	
 	-- 生成utoken
 	local utoken = ngx.md5(os.time()..uid)
+	redis:multi()
+	redis:hset(hkey,'uid',uid)
+	redis:hset(hkey,'username',username)
+	redis:hset(hkey,'utoken',utoken)
 	redis:setex('utoken:'..utoken,24*30*365, uid)
-	redis:setex('openid:'..openid,24*30*365, utoken)
+	redis:exec()
 	local data = {
-		utoken = utoken
+		utoken = utoken,
+		uid = uid
 	}
 	app:returnJson(data,200,'登录成功')
 end

@@ -1,0 +1,21 @@
+<!--index.wxml-->
+<view class="container">
+  <view wx:if="{{userInfo.utoken}}">
+    <p>
+      <image style="width: 200px; height: 200px; background-color: #eeeeee;" mode="aspectFit" src="{{userInfo.avatar}}"></image>
+    </p>
+
+    <p>
+      <button type='primary' bindtap='scan'>点击扫码</button>
+    </p>
+    <view wx:if="{{loginUrl}}">
+      <button type='primary' bindtap='loginWeb'>点击在web登录</button>
+    </view>
+    <p>
+      <button style="margin-top:100px" bindtap='logout'>点击退出</button>
+    </p>
+  </view>
+  <view wx:else>
+    <button open-type="getUserInfo" bindgetuserinfo="login">登录</button>
+  </view>
+</view>

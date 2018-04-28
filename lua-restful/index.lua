@@ -1,5 +1,5 @@
 ngx.header["Access-Control-Allow-Origin"] = "*"
-ngx.header["Access-Control-Allow-Headers"] = "DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Content-Range,Range, userid, agent, brandid, language, uid,timestamp,token,sign"
+ngx.header["Access-Control-Allow-Headers"] = "DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Content-Range,Range, userid, agent, brandid, language,timestamp,utoken,sign"
 
 if ngx.var.request_method == "OPTIONS" then
     ngx.header["Access-Control-Max-Age"] = "1728000"

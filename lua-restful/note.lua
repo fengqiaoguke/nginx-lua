@@ -30,7 +30,7 @@ function _M:add(data)
 		local id = redis:incr('sys:note:_id') 
 		local tagid = intval(data['tag_id'])
 		local uid = intval(UID)
-		local key = 'u'..uid..':note:'..id
+		local key = 'note:u'..uid..':'..id
 		if uid <= 0 then
 			app:error('请先登录')
 		end
@@ -45,9 +45,9 @@ function _M:add(data)
 		redis:hset(key,'head',cjson.encode(data['head'])) 
 		redis:hset(key,'createtime',os.date("%Y-%m-%d %H:%M:%S",os.time()))
 		--列表
-		redis:zadd('u'..uid..':note:list',os.time(),key)
+		redis:zadd('note:u'..uid..':list',os.time(),key)
 		if tagid ~= nil and tagid >0 then 
-			redis:zadd('u'..uid..':note:tag'..tagid..':list',os.time(),key)
+			redis:zadd('note:u'..uid..':tag'..tagid..':list',os.time(),key)
 		end
 		redis:exec()
     app:returnJson({['id']=id},1,'添加成功')
@@ -63,7 +63,7 @@ function _M:edit(id,data)
 		app:error('请先登录')
 	else
 		--添加到hash 
-		local key = 'u'..UID..':note:'..id
+		local key = 'note:u'..UID..':'..id
 		if data['title'] ~= nil then
 			redis:hset(key,'title',data['title'])
 		end
@@ -98,10 +98,10 @@ function _M:listData(tagId,page)
 	page = 1
   end 
   
-  local key = 'u'..uid..':note:list'
+  local key = 'note:u'..uid..':list'
   
   if tagId >0 then
-	key = 'u'..uid..':note:tag'..tagId..':list'
+	key = 'note:u'..uid..':tag'..tagId..':list'
   end  
   
   local totalNum = redis:zcard(key) or 0
@@ -137,7 +137,7 @@ function _M:info(id)
 	if UID <= 0 then
 		app:error('uid不能空')
 	end
-	local key = 'u'..UID..':note:'..id
+	local key = 'note:u'..UID..':'..id
   local data = getInfo(key)
   app:returnJson(data,1,'获取信息')
 end
